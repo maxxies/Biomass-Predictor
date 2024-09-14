@@ -4,6 +4,7 @@ import logging
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 # Set up logger
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -72,3 +73,40 @@ def features_reduction(X_train: pd.DataFrame, X_test: pd.DataFrame, threshold: f
     logging.debug(f"Explained variance ratio: {pca.explained_variance_ratio_}")
 
     return X_train, X_test
+
+
+def plot_results(model, y_true, y_pred_train, y_pred_test):
+    """
+    Plot the actual and predicted biomass values
+
+    Parameters
+    ----------
+    model : sklearn model
+        Trained model
+    y_true : numpy.ndarray
+        Actual values of the target variable
+    y_pred_train : numpy.ndarray
+        Predicted values of the training set
+    y_pred_test : numpy.ndarray
+        Predicted values of the testing set
+    """
+
+    plt.figure(figsize=(15, 10))
+
+    y_pred_combined = np.concatenate([y_pred_train, y_pred_test])
+
+    # Create an index array for x-axis
+    x = np.arange(len(y_true))
+
+    plt.plot(x, y_true, marker='o', linestyle='-',
+             color='orange', label='Actual')
+    plt.plot(x, y_pred_combined[:len(y_true)], marker='o',
+             linestyle='-', color='blue', label='Predicted')
+
+    plt.xlabel('Index')
+    plt.ylabel('Biomass Values')
+    plt.title(f'{model.__class__.__name__} Biomass Prediction')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()

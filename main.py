@@ -1,9 +1,9 @@
+from sklearn.decomposition import PCA
+import logging
 from assets.data_loader import DataLoader
 from assets.feature_engineering import FeatureGeneration
 from assets.utils import data_split
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-import logging
+from assets.model import StatisticalModels
 
 # Set up the logger
 logging.basicConfig(level=logging.DEBUG)
@@ -45,6 +45,28 @@ new_X_test_pca = pca.transform(new_X_test)
 
 logging.debug(f"Number of features before PCA: {new_X_train.shape[1]}")
 logging.debug(f"Number of features after PCA: {new_X_train_pca.shape[1]}")
+
+
+#  Model training
+logging.debug("Training models on initial features")
+models = StatisticalModels(df, X_train, X_test, y_train, y_test, 'initial') 
+models.fit_models()
+
+logging.debug("Training models on reduced initial features")
+reduced_models = StatisticalModels(df, X_train_pca, X_test_pca, y_train, y_test, 'reduced_initial')
+reduced_models.fit_models()
+
+logging.debug("Training models on new features")
+new_models = StatisticalModels(new_df, new_X_train, new_X_test, new_y_train, new_y_test, 'new')
+new_models.fit_models()
+
+logging.debug("Training models on reduced new features")
+new_reduced_models = StatisticalModels(new_df, new_X_train_pca, new_X_test_pca, new_y_train, new_y_test, 'reduced_new')
+new_reduced_models.fit_models()
+
+
+
+
 
 
 
