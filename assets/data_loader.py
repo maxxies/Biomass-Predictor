@@ -6,6 +6,7 @@ from shapely.geometry import box
 import logging
 
 # Logging configuration
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -13,7 +14,7 @@ class DataLoader:
     """
     Class to load and preprocess data for training a machine learning model
     """
-    def __init__(self, shapefile_path, raster_path):
+    def __init__(self, shapefile_path: str, raster_path: str):
         """
         Initialize the DataLoader object
 
@@ -41,8 +42,8 @@ class DataLoader:
         """
         # Load the shapefile
         gdf = gpd.read_file(self.shapefile_path)
-        logging.debug(f"Number of polygons: {len(gdf)}")
-        logging.debug(f"Shapefile CRS: {gdf.crs}")
+        logger.debug(f"Number of polygons: {len(gdf)}")
+        logger.debug(f"Shapefile CRS: {gdf.crs}")
 
         # Load the raster
         with rasterio.open(self.raster_path) as src:
@@ -51,9 +52,9 @@ class DataLoader:
             raster_bounds = src.bounds
             raster_transform = src.transform
 
-        logging.debug(f"Raster shape: {raster_data.shape}")
-        logging.debug(f"Raster CRS: {raster_meta['crs']}")
-        logging.debug(f"Number of bands in raster: {raster_data.shape[0]}")
+        logger.debug(f"Raster shape: {raster_data.shape}")
+        logger.debug(f"Raster CRS: {raster_meta['crs']}")
+        logger.debug(f"Number of bands in raster: {raster_data.shape[0]}")
 
         # Using the first 12 bands
         raster_data = raster_data[:12]
@@ -67,14 +68,14 @@ class DataLoader:
 
         # Clip the polygons to the raster extent
         gdf_clipped = gpd.overlay(gdf, raster_extent, how='intersection')
-        logging.debug(f"Number of clipped polygons: {len(gdf_clipped)}")
+        logger.debug(f"Number of clipped polygons: {len(gdf_clipped)}")
 
         # Extract features for each polygon
         features = []
         for idx, row in gdf_clipped.iterrows():
             geom = row['geometry']
             if geom.is_empty:
-                logging.warning(f"Geometry at index {idx} is empty")
+                logger.warning(f"Geometry at index {idx} is empty")
                 continue
 
             mask = geometry_mask([geom], out_shape=raster_data.shape[1:],
@@ -85,15 +86,37 @@ class DataLoader:
                 feature_vector = masked_data.mean(axis=1)
                 features.append(feature_vector)
             else:
-                logging.warning(f"No data found for polygon at index {idx}")
+                logger.warning(f"No data found for polygon at index {idx}")
 
         # Create a DataFrame with the extracted features
         feature_names = [f'B{i}' for i in range(1, raster_data.shape[0] + 1)]
         df = pd.DataFrame(features, columns=feature_names)
         df['biomass'] = gdf_clipped['biomass'][:len(features)]
 
-        logging.debug(f"DataFrame shape: {df.shape}")
-        logging.debug(f"Number of polygons with biomass values: {len(df)}")
+        # Clean the DataFrame
+        df = self._clean_df(df)
+
+        logger.debug(f"DataFrame shape: {df.shape}")
+        logger.debug(f"Number of polygons with biomass values: {len(df)}")
 
         return df, raster_data, raster_meta
+    
+    def _clean_df(self, df):
+        """
+        Clean the DataFrame by removing rows with missing values
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            DataFrame to clean
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            Cleaned DataFrame
+        """
+        df = df.dropna()
+        assert df.isnull().sum().sum() == 0, "There are missing values in the DataFrame"
+
+        return df
     

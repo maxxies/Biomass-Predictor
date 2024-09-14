@@ -7,11 +7,12 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 # Set up logger
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 
-def data_split(df: pd.Dataframe, test_size: float = 0.2):   
+def data_split(df: pd.DataFrame, test_size: float = 0.2):   
     """
     Split the data into training and testing sets
     
@@ -69,8 +70,8 @@ def features_reduction(X_train: pd.DataFrame, X_test: pd.DataFrame, threshold: f
     X_train = pca.fit_transform(X_train)
     X_test = pca.transform(X_test)
 
-    logging.debug(f"Number of features after PCA: {X_train.shape[1]}")
-    logging.debug(f"Explained variance ratio: {pca.explained_variance_ratio_}")
+    logger.debug(f"Number of features after PCA: {X_train.shape[1]}")
+    logger.debug(f"Explained variance ratio: {pca.explained_variance_ratio_}")
 
     return X_train, X_test
 

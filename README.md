@@ -19,8 +19,9 @@ The repository contains for training models to predict biomass from plots from a
 └── README.md
 ```
 1. `assets/`: Contains all the helper functions for data loading, feature engineering, model training and evaluation.
-2. `main.py`: Main script to run the model training and evaluation.
-3. `README.md`: Contains the information about the repository.
+2. `outputs/`: Contains the trained models and the plots of the model evaluation.
+3. `main.py`: Main script to run the model training and evaluation.
+4. `README.md`: Contains the information about the repository.
 
 # Model Training & Experimentations
 

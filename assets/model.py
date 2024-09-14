@@ -15,7 +15,8 @@ from tensorflow.keras import layers
 from assets.utils import plot_results
 
 # Set up the logger
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class StatisticalModels:
     def __init__(self,df, X_train, X_test, y_train, y_test, model_type):
@@ -49,11 +50,11 @@ class StatisticalModels:
             mse = mean_squared_error(self.y_test, y_pred)
             mae = mean_absolute_error(self.y_test, y_pred)
             rmse = np.sqrt(mse)
-            logging.debug(f"Model: {name}")
-            logging.debug(f"R2: {r2}")
-            logging.debug(f"MSE: {mse}")
-            logging.debug(f"MAE: {mae}")
-            logging.debug(f"RMSE: {rmse}")
+            logger.debug(f"Model: {name}")
+            logger.debug(f"R2: {r2}")
+            logger.debug(f"MSE: {mse}")
+            logger.debug(f"MAE: {mae}")
+            logger.debug(f"RMSE: {rmse}")
 
             plot_results(rs, self.df['biomass'], rs.predict(self.X_train), self.y_test)
 
@@ -90,10 +91,10 @@ class NeuralNetwork:
 
         # Evaluate the model
         loss, mae, rmse, r2 = model.evaluate(self.X_test, self.y_test)
-        logging.debug(f"Loss(MSE): {loss}")
-        logging.debug(f"MAE: {mae}")
-        logging.debug(f"RMSE: {rmse}")
-        logging.debug(f"R2: {r2}")
+        logger.debug(f"Loss(MSE): {loss}")
+        logger.debug(f"MAE: {mae}")
+        logger.debug(f"RMSE: {rmse}")
+        logger.debug(f"R2: {r2}")
 
         # Make predictions
         y_pred_nn = model.predict(self.X_test)
