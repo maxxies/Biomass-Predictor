@@ -60,7 +60,9 @@ The repository contains for training models to predict biomass from plots from a
     - Random Forest
     - Support Vector Machine
     - XGBoost
-    - ANN (Artificial Neural Network)
+    - ANN (MLP)
+        - The ANN model has 3 hidden layers with 128, 64 and 32 neurons respectively. The activation function used is ReLU and the output layer has a single neuron with a linear activation function.
+        ![ANN Architecture](outputs/plots/model.png)
 
 # Results
 

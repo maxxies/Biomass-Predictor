@@ -9,6 +9,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 from assets.utils import plot_results
 
 # Set up the logger
@@ -55,4 +58,48 @@ class StatisticalModels:
             plot_results(rs, self.df['biomass'], rs.predict(self.X_train), self.y_test)
 
             # Save model
-            joblib.dump(rs.best_estimator_, f'{self.model_type}_{name}_model.pkl')
+            joblib.dump(rs.best_estimator_, f'/output/models/{self.model_type}_{name}_model.pkl')
+
+class NeuralNetwork:    
+    def __init__(self, df, X_train, X_test, y_train, y_test, model_type):
+        self.df = df
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.model_type = model_type
+
+    def nn_train(self):
+        model = keras.Sequential([
+            layers.Dense(64, activation='relu', input_shape=(self.X_train.shape[1],)),
+            layers.Dropout(0.3),
+            layers.Dense(32, activation='relu'),
+            layers.Dense(1)
+        ])
+
+        model.compile(optimizer='adam',
+                      loss='mae',
+                      metrics=['mse', tf.keras.metrics.RootMeanSquaredError(), tf.keras.metrics.R2Score()])
+        
+
+        tf.keras.utils.plot_model(model, to_file='model.png',
+                                  show_shapes=True, show_layer_names=True)
+
+        history = model.fit(self.X_train, self.y_train, epochs=100,
+                            batch_size=16, validation_split=0.1)
+
+        # Evaluate the model
+        loss, mae, rmse, r2 = model.evaluate(self.X_test, self.y_test)
+        logging.debug(f"Loss(MSE): {loss}")
+        logging.debug(f"MAE: {mae}")
+        logging.debug(f"RMSE: {rmse}")
+        logging.debug(f"R2: {r2}")
+
+        # Make predictions
+        y_pred_nn = model.predict(self.X_test)
+
+        # Plot the results for the neural network
+        plot_results(model, self.df['biomass'], model.predict(self.X_train), y_pred_nn)
+
+        # Save the model
+        model.save(f'/output/models/{self.model_type}_nn_model.keras)')
