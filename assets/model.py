@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import joblib
 import logging
 from sklearn.model_selection import GridSearchCV
@@ -42,7 +43,6 @@ class StatisticalModels:
         for name, (model, param_grid) in self.models.items():
             rs = GridSearchCV(model, param_grid, cv=5, n_jobs=-1)
             rs.fit(self.X_train, self.y_train)
-            self.best_models[name] = rs.best_estimator_
             y_pred = rs.predict(self.X_test)
             
             # Evaluate the model
@@ -59,7 +59,8 @@ class StatisticalModels:
             plot_results(rs, self.df['biomass'], rs.predict(self.X_train), self.y_test)
 
             # Save model
-            joblib.dump(rs.best_estimator_, f'/output/models/{self.model_type}_{name}_model.pkl')
+            os.makedirs('/output', exist_ok=True)
+            joblib.dump(rs.best_estimator_, f'/output/{self.model_type}_{name}_model.pkl')
 
 class NeuralNetwork:    
     def __init__(self, df, X_train, X_test, y_train, y_test, model_type):
@@ -103,4 +104,5 @@ class NeuralNetwork:
         plot_results(model, self.df['biomass'], model.predict(self.X_train), y_pred_nn)
 
         # Save the model
-        model.save(f'/output/models/{self.model_type}_nn_model.keras)')
+        os.makedirs('/output', exist_ok=True)
+        model.save(f'/output/{self.model_type}_nn_model.keras')

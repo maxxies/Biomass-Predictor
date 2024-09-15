@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 # Load the data
 shapefile_path = "data/shapefile.dbf"
 raster_path = "data/raster.tif"
+
 data_loader = DataLoader(shapefile_path, raster_path)
 df, raster_data, raster_meta = data_loader.load_and_preprocess_data()
 logger.debug(f"Raster data shape: {raster_data.shape}")
