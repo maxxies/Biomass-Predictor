@@ -10,6 +10,8 @@ The repository contains for training models to predict biomass from plots from a
 |   ├── feature_engineering.py
 |   ├── model.py
 |   └── utils.py
+|── notebooks
+|   └── data_analysis.ipynb
 ├── outputs
 |   ├── models
 |   └── plots
@@ -19,9 +21,10 @@ The repository contains for training models to predict biomass from plots from a
 └── README.md
 ```
 1. `assets/`: Contains all the helper functions for data loading, feature engineering, model training and evaluation.
-2. `outputs/`: Contains the trained models and the plots of the model evaluation.
-3. `main.py`: Main script to run the model training and evaluation.
-4. `README.md`: Contains the information about the repository.
+2.  `notebooks/`: Contains the jupyter notebooks for the data analysis and model experiments.
+3. `outputs/`: Contains the trained models and the plots of the model evaluation.
+4. `main.py`: Main script to run the model training and evaluation.
+5. `README.md`: Contains the information about the repository.
 
 # Model Training & Experimentations
 
